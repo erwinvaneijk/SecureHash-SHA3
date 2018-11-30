@@ -37,7 +37,7 @@ The implementation is even simpler on a little endian platform. Just define the
 LITTLE_ENDIAN symbol in that case.
 
 For a more complete set of implementations, please refer to
-the Keccak Code Package at https://github.com/gvanas/KeccakCodePackage
+the Keccak Code Package at https://github.com/XKCP/XKCP
 
 For more information, please refer to:
     * [Keccak Reference] https://keccak.team/files/Keccak-reference-3.0.pdf
@@ -69,54 +69,54 @@ This file uses UTF-8 encoding, as some comments use Greek letters.
   * @param  outputByteLen   The number of output bytes desired.
   * @pre    One must have r+c=1600 and the rate a multiple of 8 bits in this implementation.
   */
-void Keccak(unsigned int rate, unsigned int capacity, const unsigned char *input, unsigned long long int inputByteLen, unsigned char delimitedSuffix, unsigned char *output, unsigned long long int outputByteLen);
+void CTS_Keccak(unsigned int rate, unsigned int capacity, const unsigned char *input, unsigned long long int inputByteLen, unsigned char delimitedSuffix, unsigned char *output, unsigned long long int outputByteLen);
 
 /**
   *  Function to compute SHAKE128 on the input message with any output length.
   */
-void FIPS202_SHAKE128(const unsigned char *input, unsigned int inputByteLen, unsigned char *output, int outputByteLen)
+void CTS_FIPS202_SHAKE128(const unsigned char *input, unsigned int inputByteLen, unsigned char *output, int outputByteLen)
 {
-    Keccak(1344, 256, input, inputByteLen, 0x1F, output, outputByteLen);
+    CTS_Keccak(1344, 256, input, inputByteLen, 0x1F, output, outputByteLen);
 }
 
 /**
   *  Function to compute SHAKE256 on the input message with any output length.
   */
-void FIPS202_SHAKE256(const unsigned char *input, unsigned int inputByteLen, unsigned char *output, int outputByteLen)
+void CTS_FIPS202_SHAKE256(const unsigned char *input, unsigned int inputByteLen, unsigned char *output, int outputByteLen)
 {
-    Keccak(1088, 512, input, inputByteLen, 0x1F, output, outputByteLen);
+    CTS_Keccak(1088, 512, input, inputByteLen, 0x1F, output, outputByteLen);
 }
 
 /**
   *  Function to compute SHA3-224 on the input message. The output length is fixed to 28 bytes.
   */
-void FIPS202_SHA3_224(const unsigned char *input, unsigned int inputByteLen, unsigned char *output)
+void CTS_FIPS202_SHA3_224(const unsigned char *input, unsigned int inputByteLen, unsigned char *output)
 {
-    Keccak(1152, 448, input, inputByteLen, 0x06, output, 28);
+    CTS_Keccak(1152, 448, input, inputByteLen, 0x06, output, 28);
 }
 
 /**
   *  Function to compute SHA3-256 on the input message. The output length is fixed to 32 bytes.
   */
-void FIPS202_SHA3_256(const unsigned char *input, unsigned int inputByteLen, unsigned char *output)
+void CTS_FIPS202_SHA3_256(const unsigned char *input, unsigned int inputByteLen, unsigned char *output)
 {
-    Keccak(1088, 512, input, inputByteLen, 0x06, output, 32);
+    CTS_Keccak(1088, 512, input, inputByteLen, 0x06, output, 32);
 }
 
 /**
   *  Function to compute SHA3-384 on the input message. The output length is fixed to 48 bytes.
   */
-void FIPS202_SHA3_384(const unsigned char *input, unsigned int inputByteLen, unsigned char *output)
+void CTS_FIPS202_SHA3_384(const unsigned char *input, unsigned int inputByteLen, unsigned char *output)
 {
-    Keccak(832, 768, input, inputByteLen, 0x06, output, 48);
+    CTS_Keccak(832, 768, input, inputByteLen, 0x06, output, 48);
 }
 
 /**
   *  Function to compute SHA3-512 on the input message. The output length is fixed to 64 bytes.
   */
-void FIPS202_SHA3_512(const unsigned char *input, unsigned int inputByteLen, unsigned char *output)
+void CTS_FIPS202_SHA3_512(const unsigned char *input, unsigned int inputByteLen, unsigned char *output)
 {
-    Keccak(576, 1024, input, inputByteLen, 0x06, output, 64);
+    CTS_Keccak(576, 1024, input, inputByteLen, 0x06, output, 64);
 }
 
 /*
@@ -133,7 +133,7 @@ typedef UINT64 tKeccakLane;
 /** Function to load a 64-bit value using the little-endian (LE) convention.
   * On a LE platform, this could be greatly simplified using a cast.
   */
-static UINT64 load64(const UINT8 *x)
+inline UINT64 CTS_load64(const UINT8 *x)
 {
     int i;
     UINT64 u=0;
@@ -148,7 +148,7 @@ static UINT64 load64(const UINT8 *x)
 /** Function to store a 64-bit value using the little-endian (LE) convention.
   * On a LE platform, this could be greatly simplified using a cast.
   */
-static void store64(UINT8 *x, UINT64 u)
+inline void CTS_store64(UINT8 *x, UINT64 u)
 {
     unsigned int i;
 
@@ -161,7 +161,7 @@ static void store64(UINT8 *x, UINT64 u)
 /** Function to XOR into a 64-bit value using the little-endian (LE) convention.
   * On a LE platform, this could be greatly simplified using a cast.
   */
-static void xor64(UINT8 *x, UINT64 u)
+inline void CTS_xor64(UINT8 *x, UINT64 u)
 {
     unsigned int i;
 
@@ -181,23 +181,30 @@ A readable and compact implementation of the Keccak-f[1600] permutation.
 #define ROL64(a, offset) ((((UINT64)a) << offset) ^ (((UINT64)a) >> (64-offset)))
 #define i(x, y) ((x)+5*(y))
 
+// This test works on GCC and CLANG, which is good enough for me
+#ifdef __LITTLE_ENDIAN__
+#define LITTLE_ENDIAN
+#endif
 
+#if !defined(__LITTLE_ENDIAN__) || !defined(__BIG_ENDIAN__)
+#error "This C code currently assumes a CLANG / GCC compatible cpp env"
+#endif
 
 #ifdef LITTLE_ENDIAN
     #define readLane(x, y)          (((tKeccakLane*)state)[i(x, y)])
     #define writeLane(x, y, lane)   (((tKeccakLane*)state)[i(x, y)]) = (lane)
     #define XORLane(x, y, lane)     (((tKeccakLane*)state)[i(x, y)]) ^= (lane)
 #else
-    #define readLane(x, y)          load64((UINT8*)state+sizeof(tKeccakLane)*i(x, y))
-    #define writeLane(x, y, lane)   store64((UINT8*)state+sizeof(tKeccakLane)*i(x, y), lane)
-    #define XORLane(x, y, lane)     xor64((UINT8*)state+sizeof(tKeccakLane)*i(x, y), lane)
+    #define readLane(x, y)          CTS_load64((UINT8*)state+sizeof(tKeccakLane)*i(x, y))
+    #define writeLane(x, y, lane)   CTS_store64((UINT8*)state+sizeof(tKeccakLane)*i(x, y), lane)
+    #define XORLane(x, y, lane)     CTS_xor64((UINT8*)state+sizeof(tKeccakLane)*i(x, y), lane)
 #endif
 
 /**
   * Function that computes the linear feedback shift register (LFSR) used to
   * define the round constants (see [Keccak Reference, Section 1.2]).
   */
-int LFSR86540(UINT8 *LFSR)
+static inline nt CTS_LFSR86540(UINT8 *LFSR)
 {
     int result = ((*LFSR) & 0x01) != 0;
     if (((*LFSR) & 0x80) != 0)
@@ -211,7 +218,7 @@ int LFSR86540(UINT8 *LFSR)
 /**
  * Function that computes the Keccak-f[1600] permutation on the given state.
  */
-void KeccakF1600_StatePermute(void *state)
+static void CTS_KeccakF1600_StatePermute(void *state)
 {
     unsigned int round, x, y, j, t;
     UINT8 LFSRstate = 0x01;
@@ -265,7 +272,7 @@ void KeccakF1600_StatePermute(void *state)
         {   /* === ι step (see [Keccak Reference, Section 2.3.5]) === */
             for(j=0; j<7; j++) {
                 unsigned int bitPosition = (1<<j)-1; /* 2^j-1 */
-                if (LFSR86540(&LFSRstate))
+                if (CTS_LFSR86540(&LFSRstate))
                     XORLane(0, 0, (tKeccakLane)1<<bitPosition);
             }
         }
@@ -282,7 +289,7 @@ that use the Keccak-f[1600] permutation.
 #include <string.h>
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-void Keccak(unsigned int rate, unsigned int capacity, const unsigned char *input, unsigned long long int inputByteLen, unsigned char delimitedSuffix, unsigned char *output, unsigned long long int outputByteLen)
+void CTS_Keccak(unsigned int rate, unsigned int capacity, const unsigned char *input, unsigned long long int inputByteLen, unsigned char delimitedSuffix, unsigned char *output, unsigned long long int outputByteLen)
 {
     UINT8 state[200];
     unsigned int rateInBytes = rate/8;
@@ -304,7 +311,7 @@ void Keccak(unsigned int rate, unsigned int capacity, const unsigned char *input
         inputByteLen -= blockSize;
 
         if (blockSize == rateInBytes) {
-            KeccakF1600_StatePermute(state);
+            CTS_KeccakF1600_StatePermute(state);
             blockSize = 0;
         }
     }
@@ -314,11 +321,11 @@ void Keccak(unsigned int rate, unsigned int capacity, const unsigned char *input
     state[blockSize] ^= delimitedSuffix;
     /* If the first bit of padding is at position rate-1, we need a whole new block for the second bit of padding */
     if (((delimitedSuffix & 0x80) != 0) && (blockSize == (rateInBytes-1)))
-        KeccakF1600_StatePermute(state);
+        CTS_KeccakF1600_StatePermute(state);
     /* Add the second bit of padding */
     state[rateInBytes-1] ^= 0x80;
     /* Switch to the squeezing phase */
-    KeccakF1600_StatePermute(state);
+   CTS_KeccakF1600_StatePermute(state);
 
     /* === Squeeze out all the output blocks === */
     while(outputByteLen > 0) {
@@ -328,6 +335,6 @@ void Keccak(unsigned int rate, unsigned int capacity, const unsigned char *input
         outputByteLen -= blockSize;
 
         if (outputByteLen > 0)
-            KeccakF1600_StatePermute(state);
+            CTS_KeccakF1600_StatePermute(state);
     }
 }
