@@ -37,9 +37,9 @@ void CTS_FIPS202_SHA3_512(const unsigned char *input, unsigned int inputByteLen,
 
 -}
 foreign import capi unsafe "CTS_SHA3.h CTS_FIPS202_SHA3_512"
-  c_unsafe_FIPS202_SHA3_512 :: Ptr Word8 -> CUInt -> Ptr Word8 -> IO ()
+  c_unsafe_FIPS202_SHA3_512 :: Ptr Word8 -> Word32 -> Ptr Word8 -> IO ()
 foreign import capi safe "CTS_SHA3.h CTS_FIPS202_SHA3_512"
-  c_safe_FIPS202_SHA3_512 :: Ptr Word8 -> CUInt -> Ptr Word8 -> IO ()
+  c_safe_FIPS202_SHA3_512 :: Ptr Word8 -> Word32 -> Ptr Word8 -> IO ()
 
 foreign import capi unsafe "CTS_SHA3.h CTS_FIPS202_SHA3_256"
   c_unsafe_FIPS202_SHA3_256 :: Ptr Word8 -> CUInt -> Ptr Word8 -> IO ()
