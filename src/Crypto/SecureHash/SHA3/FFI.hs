@@ -1,3 +1,17 @@
+{-# LANGUAGE CApiFFI #-}
+{-# LANGUAGE Unsafe  #-}
+
+-- Ugly hack to workaround https://ghc.haskell.org/trac/ghc/ticket/14452
+{-# OPTIONS_GHC -O0
+                -fdo-lambda-eta-expansion
+                -fcase-merge
+                -fstrictness
+                -fno-omit-interface-pragmas
+                -fno-ignore-interface-pragmas #-}
+
+{-# OPTIONS_GHC -optc-Wall -optc-O3 #-}
+
+
 
 module Crypto.SecureHash.SHA3.FFI where
 
@@ -19,10 +33,12 @@ void CTS_FIPS202_SHA3_512(const unsigned char *input, unsigned int inputByteLen,
 -}
 
 
-{- NOTE: CUChar or Word
+{- NOTE: CUChar or Word8 would be more precise, but I'm giving them type CCHar
 
 -}
-foreign import ccall unsafe "CTS_FIPS202_SHA3_512"
-  c_unsafe_FIPS202_SHA3_512 :: Ptr CChar -> CUInt -> Ptr Word8 -> IO ()
-foreign import ccall safe "CTS_FIPS202_SHA3_512"
-  c_safe_FIPS202_SHA3_512 :: Ptr CChar -> CUInt -> Ptr Word8 -> IO ()
+foreign import capi unsafe "CTS_SHA3.h CTS_FIPS202_SHA3_512"
+  c_unsafe_FIPS202_SHA3_512 :: Ptr Word8 -> CUInt -> Ptr Word8 -> IO ()
+
+-- cant import define
+foreign import capi safe "CTS_SHA3.h  CTS_FIPS202_SHA3_512"
+  c_safe_FIPS202_SHA3_512 :: Ptr Word8 -> CUInt -> Ptr Word8 -> IO ()
