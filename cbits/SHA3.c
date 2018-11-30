@@ -186,7 +186,7 @@ A readable and compact implementation of the Keccak-f[1600] permutation.
 #define LITTLE_ENDIAN
 #endif
 
-#if !defined(__LITTLE_ENDIAN__) || !defined(__BIG_ENDIAN__)
+#if !(defined(__LITTLE_ENDIAN__) || defined(__BIG_ENDIAN__))
 #error "This C code currently assumes a CLANG / GCC compatible cpp env"
 #endif
 
@@ -204,7 +204,7 @@ A readable and compact implementation of the Keccak-f[1600] permutation.
   * Function that computes the linear feedback shift register (LFSR) used to
   * define the round constants (see [Keccak Reference, Section 1.2]).
   */
-static inline nt CTS_LFSR86540(UINT8 *LFSR)
+static inline int CTS_LFSR86540(UINT8 *LFSR)
 {
     int result = ((*LFSR) & 0x01) != 0;
     if (((*LFSR) & 0x80) != 0)
