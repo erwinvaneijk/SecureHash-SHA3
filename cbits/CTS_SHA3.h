@@ -191,14 +191,17 @@ A readable and compact implementation of the Keccak-f[1600] permutation.
 // This test works on GCC and CLANG, which is good enough for me
 #if defined(__LITTLE_ENDIAN__) && !defined(LITTLE_ENDIAN)  \
   || (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#define LITTLE_ENDIAN
-endif
+#ifndef CTS_TEST_LITTLE_ENDIAN
+#define CTS_TEST_LITTLE_ENDIAN
+#endif
+#endif
 
-#if !(defined(__LITTLE_ENDIAN__) || defined(__BIG_ENDIAN__)  || defined (__ORDER_LITTLE_ENDIAN__))
+#if !(defined(__LITTLE_ENDIAN__) || defined(__BIG_ENDIAN__)  \
+      || defined(__BYTE_ORDER__) || defined (__ORDER_LITTLE_ENDIAN__) )
 #error "This C code currently assumes a CLANG / GCC compatible cpp env"
 #endif
 
-#ifdef LITTLE_ENDIAN
+#ifdef CTS_TEST_LITTLE_ENDIAN
     #define readLane(x, y)          (((tKeccakLane*)state)[i(x, y)])
     #define writeLane(x, y, lane)   (((tKeccakLane*)state)[i(x, y)]) = (lane)
     #define XORLane(x, y, lane)     (((tKeccakLane*)state)[i(x, y)]) ^= (lane)
