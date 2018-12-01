@@ -189,11 +189,12 @@ A readable and compact implementation of the Keccak-f[1600] permutation.
 #define i(x, y) ((x)+5*(y))
 
 // This test works on GCC and CLANG, which is good enough for me
-#if defined(__LITTLE_ENDIAN__) && !defined(LITTLE_ENDIAN)
+#if defined(__LITTLE_ENDIAN__) && !defined(LITTLE_ENDIAN)  \
+  || (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
 #define LITTLE_ENDIAN
-#endif
+endif
 
-#if !(defined(__LITTLE_ENDIAN__) || defined(__BIG_ENDIAN__))
+#if !(defined(__LITTLE_ENDIAN__) || defined(__BIG_ENDIAN__)  || defined (__ORDER_LITTLE_ENDIAN__))
 #error "This C code currently assumes a CLANG / GCC compatible cpp env"
 #endif
 
