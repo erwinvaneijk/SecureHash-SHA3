@@ -1,6 +1,6 @@
 #ifndef HS_SECUREHASH_SHA3_H
 #define HS_SECUREHASH_SHA3_H
-
+#include<stdint.h>
 /*
 Implementation by the Keccak Team, namely, Guido Bertoni, Joan Daemen,
 Michaël Peeters, Gilles Van Assche and Ronny Van Keer,
@@ -72,12 +72,12 @@ This file uses UTF-8 encoding, as some comments use Greek letters.
   * @param  outputByteLen   The number of output bytes desired.
   * @pre    One must have r+c=1600 and the rate a multiple of 8 bits in this implementation.
   */
-static void CTS_Keccak(unsigned int rate, unsigned int capacity, const unsigned char *input, unsigned long long int inputByteLen, unsigned char delimitedSuffix, unsigned char *output, unsigned long long int outputByteLen);
+static void CTS_Keccak(unsigned int rate, unsigned int capacity, const unsigned char *input, uint64_t inputByteLen, unsigned char delimitedSuffix, unsigned char *output, uint64_t outputByteLen);
 
 /**
   *  Function to compute SHAKE128 on the input message with any output length.
   */
-static void CTS_FIPS202_SHAKE128(const unsigned char *input, unsigned int inputByteLen, unsigned char *output, int outputByteLen)
+static void CTS_FIPS202_SHAKE128(const unsigned char *input, uint64_t inputByteLen, unsigned char *output, uint64_t outputByteLen)
 {
     CTS_Keccak(1344, 256, input, inputByteLen, 0x1F, output, outputByteLen);
 }
@@ -85,7 +85,7 @@ static void CTS_FIPS202_SHAKE128(const unsigned char *input, unsigned int inputB
 /**
   *  Function to compute SHAKE256 on the input message with any output length.
   */
-static void CTS_FIPS202_SHAKE256(const unsigned char *input, unsigned int inputByteLen, unsigned char *output, int outputByteLen)
+static void CTS_FIPS202_SHAKE256(const unsigned char *input, uint64_t inputByteLen, unsigned char *output, uint64_t outputByteLen)
 {
     CTS_Keccak(1088, 512, input, inputByteLen, 0x1F, output, outputByteLen);
 }
@@ -93,7 +93,7 @@ static void CTS_FIPS202_SHAKE256(const unsigned char *input, unsigned int inputB
 /**
   *  Function to compute SHA3-224 on the input message. The output length is fixed to 28 bytes.
   */
-static void CTS_FIPS202_SHA3_224(const unsigned char *input, unsigned int inputByteLen, unsigned char *output)
+static void CTS_FIPS202_SHA3_224(const unsigned char *input, uint64_t inputByteLen, unsigned char *output)
 {
     CTS_Keccak(1152, 448, input, inputByteLen, 0x06, output, 28);
 }
@@ -101,7 +101,7 @@ static void CTS_FIPS202_SHA3_224(const unsigned char *input, unsigned int inputB
 /**
   *  Function to compute SHA3-256 on the input message. The output length is fixed to 32 bytes.
   */
-static void CTS_FIPS202_SHA3_256(const unsigned char *input, unsigned int inputByteLen, unsigned char *output)
+static void CTS_FIPS202_SHA3_256(const unsigned char *input, uint64_t inputByteLen, unsigned char *output)
 {
     CTS_Keccak(1088, 512, input, inputByteLen, 0x06, output, 32);
 }
@@ -109,7 +109,7 @@ static void CTS_FIPS202_SHA3_256(const unsigned char *input, unsigned int inputB
 /**
   *  Function to compute SHA3-384 on the input message. The output length is fixed to 48 bytes.
   */
-static void CTS_FIPS202_SHA3_384(const unsigned char *input, unsigned int inputByteLen, unsigned char *output)
+static void CTS_FIPS202_SHA3_384(const unsigned char *input, uint64_t inputByteLen, unsigned char *output)
 {
     CTS_Keccak(832, 768, input, inputByteLen, 0x06, output, 48);
 }
@@ -133,7 +133,7 @@ Technicalities
 */
 
 typedef unsigned char UINT8;
-typedef unsigned long long int UINT64;
+typedef uint64_t UINT64;
 typedef UINT64 tKeccakLane;
 
 #ifndef LITTLE_ENDIAN
@@ -300,7 +300,7 @@ that use the Keccak-f[1600] permutation.
 #include <string.h>
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-static void CTS_Keccak(unsigned int rate, unsigned int capacity, const unsigned char *input, unsigned long long int inputByteLen, unsigned char delimitedSuffix, unsigned char *output, unsigned long long int outputByteLen)
+static void CTS_Keccak(unsigned int rate, unsigned int capacity, const unsigned char *input, uint64_t inputByteLen, unsigned char delimitedSuffix, unsigned char *output, uint64_t outputByteLen)
 {
     UINT8 state[200];
     unsigned int rateInBytes = rate/8;
