@@ -1,8 +1,5 @@
 {-# LANGUAGE BangPatterns #-}
-{-# LANGUAGE CPP#-}
-#if __GLASGOW_HASKELL__ >= 700
 {-# LANGUAGE Trustworthy  #-}
-#endif
 {- | This module exposes the reference sha3 functions with digest sizes
 
 
