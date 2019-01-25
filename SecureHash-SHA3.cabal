@@ -11,7 +11,7 @@ name:                SecureHash-SHA3
 -- PVP summary:      +-+------- breaking API changes
 --                   | | +----- non-breaking API additions
 --                   | | | +--- code changes with no API change
-version:             0.1.0.2
+version:             0.1.1.0
 
 -- A short (one-line) description of the package.
 synopsis:            simple static linked SHA3 using private symbols and the ref impl

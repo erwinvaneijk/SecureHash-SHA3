@@ -9,3 +9,6 @@ https://github.com/XKCP/XKCP/tree/58b20ec99f8a891913d8cf0ea350d05b6fb3ae41
 ## Acknowledgments
 HVR has some great similar packages which are a treasure trove of ideas and
 clever snippets
+
+## keywords
+sha3, keccak, hash, secure, mac, hmac, doodad, cryptography, ninjas, and haskell!
