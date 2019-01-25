@@ -1,5 +1,8 @@
 # Revision history for SecureHash-SHA3
 
+## 0.1.1.1 -- 2019-01-25
+* added support for ghc 7.0.4
+
 ## 0.1.1.0 -- 2019-01-25
 * added 256, 228, 384 size hash output variants of sha3, to round out the
   initial 512 bit one!
