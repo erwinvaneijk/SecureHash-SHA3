@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Haskell CI
+name: build of SecureHash-SHA3
 
 on:
   push:
@@ -15,7 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ghc: [ "7.0.4", "7.2.2", "7.4.2", "7.6.3", "7.8.4", "7.10.3", "8.0.2", "8.2.2", "8.4.4", "8.6.3", "9.2.8", "9.4.5", "9.6.2"]
+        ghc:
+          [ "9.6.2", "9.4.5", "7.0.4", "7.2.2", "7.4.2", "7.6.3", "7.8.4", "7.10.3", "8.0.2", "8.2.2", "8.4.4", "8.6.3", "9.2.8"]
 
     env:
       CONFIG: "--enable-tests --enable-benchmarks"
